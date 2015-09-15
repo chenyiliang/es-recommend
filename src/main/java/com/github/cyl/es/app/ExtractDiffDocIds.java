@@ -16,7 +16,7 @@ import com.mongodb.client.MongoDatabase;
 public class ExtractDiffDocIds {
 	private static final String MONGO_HOST = "121.40.108.158";
 	private static final int MONGO_PORT = 27017;
-	private static final String DATABASE = "hugo_server";
+	private static final String DATABASE = "hugo_server_dtcj";
 	private static final String COLLECTION = "documents";
 	private static final String IDS_FILE = "d:/data/idList.txt";
 
