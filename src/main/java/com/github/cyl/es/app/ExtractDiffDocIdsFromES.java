@@ -19,8 +19,8 @@ public class ExtractDiffDocIdsFromES {
 	private static final String ES_HOST = "121.43.181.142";
 	private static final int ES_PORT = 9301;
 	private static final String CLUSTER_NAME = "elasticsearch_tapas_devel";
-	private static final String INDEX = "hugo-information-development";
-	private static final String TYPE = "information";
+	private static final String INDEX = "hugo-documents-tuijian-development";
+	private static final String TYPE = "document-tuijian";
 	private static final String[] FETCH_FIELDS = { "title", "origin_url" };
 	private static final String IDS_FILE = "d:/data/idList.txt";
 

@@ -33,16 +33,16 @@ import org.elasticsearch.index.query.MoreLikeThisQueryBuilder.Item;
 import org.elasticsearch.search.SearchHit;
 
 public class RecommendApp {
-	private static final String ES_HOST = "121.40.108.158";
-	private static final int ES_PORT = 9300;
-	private static final String CLUSTER_NAME = "elasticsearch";
-	private static final String INDEX = "yicai";
-	private static final String TYPE = "news";
+	private static final String ES_HOST = "121.43.181.142";
+	private static final int ES_PORT = 9301;
+	private static final String CLUSTER_NAME = "elasticsearch_tapas_devel";
+	private static final String INDEX = "hugo-documents-tuijian-development";
+	private static final String TYPE = "document-tuijian";
 	private static final String REC_FIELD = "content";
 	private static final int RECOMMEND_NUM = 10;
 	private static final String[] FETCH_FIELDS = { "title", "origin_url" };
 	private static final String IDS_FILE = "d:/data/idList.txt";
-	private static final String REC_RESULT_PATH = "d:/data/rec_result_test.csv";
+	private static final String REC_RESULT_PATH = "d:/data/rec_result.csv";
 	private static final List<String> ID_LIST = new ArrayList<String>();
 
 	static {
@@ -127,7 +127,7 @@ public class RecommendApp {
 		MoreLikeThisQueryBuilder queryBuilder = QueryBuilders
 				.moreLikeThisQuery(field).docs(new Item(index, type, id))
 				.minWordLength(2).minDocFreq(2).minTermFreq(2)
-				.maxQueryTerms(200).analyzer("ik_smart");
+				.maxQueryTerms(100).analyzer("ik_smart");
 		return queryBuilder;
 	}
 
