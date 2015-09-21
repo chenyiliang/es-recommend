@@ -36,9 +36,6 @@ public class QueryTest2 {
 			SearchHit hit = hits[i];
 			Map<String, SearchHitField> fields = hit.getFields();
 			System.out.println(hit.getId());
-			System.out.println(fields.get("title").getValue());
-			System.out.println(fields.get("content").getValue());
-			System.out.println(fields.get("origin_url").getValue());
 			System.out.println("****************************");
 		}
 	}

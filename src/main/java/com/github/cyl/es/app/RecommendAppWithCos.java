@@ -17,6 +17,8 @@ import java.util.Set;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apdplat.word.analysis.CosineTextSimilarity;
+import org.apdplat.word.analysis.TextSimilarity;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
@@ -32,7 +34,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.MoreLikeThisQueryBuilder.Item;
 import org.elasticsearch.search.SearchHit;
 
-public class RecommendApp {
+public class RecommendAppWithCos {
 	private static final String ES_HOST = "121.43.181.142";
 	private static final int ES_PORT = 9301;
 	private static final String CLUSTER_NAME = "elasticsearch_tapas_devel";
@@ -42,8 +44,12 @@ public class RecommendApp {
 	private static final int RECOMMEND_NUM = 10;
 	private static final String[] FETCH_FIELDS = { "title", "origin_url" };
 	private static final String IDS_FILE = "d:/data/idList.txt";
-	private static final String REC_RESULT_PATH = "d:/data/rec_result.csv";
+	private static final String REC_RESULT_PATH = "d:/data/rec_result_cosine.csv";
 	private static final List<String> ID_LIST = new ArrayList<String>();
+
+	private static final TextSimilarity TEXTSIMILARITY = new CosineTextSimilarity();
+
+	private static final Map<String, Double> cosineMap = new HashMap<String, Double>();
 
 	static {
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(IDS_FILE), "utf-8"))) {
@@ -85,13 +91,13 @@ public class RecommendApp {
 				for (int j = 0; j < hits.length; j++) {
 					SearchHit hit = hits[j];
 					if (!checkDuplicated(hit, recommendHits)) {
+						computeAndInsertCosineSimilarity(id, hit, client);
 						recommendHits.add(hit);
 					}
 				}
 
 				from += fetchNum;
 			}
-
 			recommendMap.put(id, recommendHits);
 		}
 
@@ -143,6 +149,15 @@ public class RecommendApp {
 		}
 	}
 
+	private static void computeAndInsertCosineSimilarity(String id, SearchHit hit, Client client) {
+		String target = client.prepareGet(INDEX, TYPE, id).execute().actionGet().getSource().get("content").toString();
+		String rec = client.prepareGet(INDEX, TYPE, hit.getId()).execute().actionGet().getSource().get("content")
+				.toString();
+		double cosine = TEXTSIMILARITY.similarScore(target, rec);
+		cosineMap.put(id + ":" + hit.getId(), cosine);
+		System.out.println(cosine);
+	}
+
 	private static void writeRecResultsToCsv(Map<String, List<SearchHit>> map, String outpath) {
 		File file = new File(outpath);
 		CSVFormat format = CSVFormat.DEFAULT.withRecordSeparator('\n'); // 每条记录间隔符
@@ -165,7 +180,8 @@ public class RecommendApp {
 			List<SearchHit> hits = entry.getValue();
 			for (int i = 0; i < hits.size(); i++) {
 				SearchHit hit = hits.get(i);
-				oneRecord.add(hit.getId() + "|" + hit.getScore());
+				oneRecord.add(
+						hit.getId() + "|" + hit.getScore() + "|" + cosineMap.get(entry.getKey() + ":" + hit.getId()));
 			}
 
 			try {

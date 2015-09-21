@@ -21,12 +21,9 @@ public class QueryTest {
 		String field = "content";
 		String id = "559aaf04695a3212ab000000";
 		Client client = NativeClient.createTransportClient();
-		QueryBuilder mltQueryBuilder = MoreLikeThisQueryFactory
-				.getMLTQueryForOneIndexedDoc(index, type, id, field);
-		SearchResponse response = client.prepareSearch("yicai")
-				.setTypes("news")
-				.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-				.setQuery(mltQueryBuilder).setSize(10)
+		QueryBuilder mltQueryBuilder = MoreLikeThisQueryFactory.getMLTQueryForOneIndexedDoc(index, type, id, field);
+		SearchResponse response = client.prepareSearch("yicai").setTypes("news")
+				.setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setQuery(mltQueryBuilder).setSize(10)
 				.addFields("title", "content").execute().actionGet();
 		SearchHit[] hits = response.getHits().getHits();
 		for (int i = 0; i < hits.length; i++) {
@@ -34,8 +31,6 @@ public class QueryTest {
 			Map<String, SearchHitField> fields = hit.getFields();
 			System.out.println(hit.getId());
 			System.out.println(hit.getScore());
-			System.out.println(fields.get("title").getValue());
-			System.out.println(fields.get("content").getValue());
 			System.out.println("****************************");
 		}
 	}
